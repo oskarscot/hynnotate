@@ -32,19 +32,44 @@ The annotated version:
 
 ```java
 @IncludeCodec
-public class Reward {
+public class RewardComponent implements Component<EntityStore> {
 
     @CodecField
     private String name;
 
     @CodecField("Amount")
-    private int amount;
+    private Integer amount;
 
-    public Reward() {}
+    public RewardComponent() {}
+    
+    // rest of the component...
 }
 ```
 
-The processor generates `Reward_Codec.java` at compile time. You reference `Reward_Codec.CODEC` like you would have written by hand.
+The processor generates `RewardComponent_Codec.java` at compile time. You reference `RewardComponent_Codec.CODEC` like you would have written by hand.
+
+Generated class:
+```java
+package dev.onyxium.hynnotate.example;
+
+import com.hypixel.hytale.codec.KeyedCodec;
+import com.hypixel.hytale.codec.builder.BuilderCodec;
+
+public final class RewardComponent_Codec {
+    public static final BuilderCodec<RewardComponent> CODEC = BuilderCodec.builder(RewardComponent.class, RewardComponent::new)
+    .append(new KeyedCodec<>("Name", BuilderCodec.STRING), RewardComponent::setName, RewardComponent::getName).add()
+    .append(new KeyedCodec<>("Amount", BuilderCodec.INTEGER), RewardComponent::setAmount, RewardComponent::getAmount).add()
+    .build();
+}
+```
+
+Usage:
+```java
+    @Override
+    protected void setup() {
+        getEntityStoreRegistry().registerComponent(RewardComponent.class, "RewardComponent", RewardComponent_Codec.CODEC);
+    }
+```
 
 ## Status
 

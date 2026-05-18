@@ -13,7 +13,6 @@ public class HynnotateExample extends JavaPlugin {
 
     @Override
     protected void setup() {
-        getLogger().atInfo().log("HynnotateExample plugin loaded.");
         getEntityStoreRegistry().registerComponent(RewardComponent.class, "RewardComponent", RewardComponent_Codec.CODEC);
     }
 }
