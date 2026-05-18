@@ -8,14 +8,14 @@ Hand-written, a class with a codec usually looks like this:
 
 ```java
 // hand-written
-public class Reward {
+public class RewardComponent implements Component<EntityStore> {
 
     // rest of the class...
 
-    public Reward() { } // no-args constructor is required (we could also generate it if missing)
+    public RewardComponent() { } // no-args constructor is required
 
     public static final BuilderCodec<Reward> CODEC = BuilderCodec
-            .builder(Reward.class, Reward::new)
+            .builder(RewardComponent.class, RewardComponent::new)
             .append(new KeyedCodec<>("Name", Codec.STRING),
                     (o, v) -> o.name = v, o -> o.name)
                 .add()
