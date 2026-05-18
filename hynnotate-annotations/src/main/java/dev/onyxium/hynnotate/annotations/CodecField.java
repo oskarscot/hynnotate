@@ -21,7 +21,7 @@ import java.lang.annotation.Target;
 /// ### Example
 /// ```java
 /// @CodecField    // key becomes "Amount" (derived from field name)
-/// private int amount;
+/// private Integer amount;
 ///
 /// @CodecField("Expires")  // key becomes "Expires" (explicit override)
 /// private Instant expiresAt;

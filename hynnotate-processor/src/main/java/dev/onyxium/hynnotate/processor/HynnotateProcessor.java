@@ -33,7 +33,7 @@ public class HynnotateProcessor extends AbstractProcessor {
                 IncludeCodec.class, new CodecModuleProcessor(env)
         );
         env.getMessager().printMessage(Diagnostic.Kind.NOTE,
-                "Hynnotate processor initialized");
+                "Starting Hynnotate processor...");
     }
 
     @Override

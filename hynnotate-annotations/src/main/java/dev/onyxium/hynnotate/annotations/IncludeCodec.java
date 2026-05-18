@@ -30,7 +30,7 @@ import java.lang.annotation.Target;
 /// @IncludeCodec
 /// public class Reward {
 ///     @CodecField private String name;
-///     @CodecField private int amount;
+///     @CodecField private Integer amount;
 /// }
 /// ```
 /// Generates `Reward_Codec.CODEC` with keys `Name` and `Amount`.
