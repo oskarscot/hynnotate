@@ -15,8 +15,8 @@ import java.lang.annotation.Target;
 /// ### How the codec for each field is picked
 /// For each [CodecField], the processor tries these in order:
 /// 1. The [CodecWith] expression on the field, if present.
-/// 2. The built-in mapping for standard types (`int` -> `BuilderCodec.INTEGER`,
-///    `String` -> `BuilderCodec.STRING`, `Instant` -> `BuilderCodec.INSTANT`, etc.).
+/// 2. The built-in mapping for standard types (`int` -> `Codec.INTEGER`,
+///    `String` -> `Codec.STRING`, `Instant` -> `Codec.INSTANT`, etc.).
 /// 3. `<Type>_Codec.CODEC` if the field's type also has `@IncludeCodec`.
 /// 4. `<Type>.CODEC` if the field's type has a public static `CODEC`.
 /// 5. Otherwise compilation fails with an error.
