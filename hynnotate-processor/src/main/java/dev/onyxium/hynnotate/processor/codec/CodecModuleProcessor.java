@@ -24,10 +24,15 @@ public class CodecModuleProcessor implements ModuleProcessor {
 
     @Override
     public void generate(TypeElement type) {
-        // TODO: check whether no-arg constructor exists
         // TODO: check whether public getters and setters exist
         var packageElement = env.getElementUtils().getPackageOf(type);
         var typeName = ClassName.get(type);
+
+        if(!hasEmptyConstructor(type)) {
+            env.getMessager().printError("Class " + type.getSimpleName() + " does not declare an empty constructor!");
+            return;
+        }
+
         var builderCodecWithType = ParameterizedTypeName.get(builderCodec, typeName);
         var codec = FieldSpec.builder(builderCodecWithType, "CODEC", Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
                 .initializer(buildCodec(type))
@@ -39,6 +44,7 @@ public class CodecModuleProcessor implements ModuleProcessor {
                 .build();
 
         var build = JavaFile.builder(packageElement.getQualifiedName().toString(), clazz)
+                .indent("    ")
                 .build();
 
         env.getMessager().printMessage(Diagnostic.Kind.NOTE, "Generated CODEC for " + type);
@@ -74,6 +80,15 @@ public class CodecModuleProcessor implements ModuleProcessor {
 
         codeBlock.add(".build()");
         return codeBlock.build();
+    }
+
+    private boolean hasEmptyConstructor(TypeElement type) {
+        return type.getEnclosedElements().stream()
+                .filter(e -> e.getKind() == ElementKind.CONSTRUCTOR)
+                .map(ExecutableElement.class::cast)
+                .anyMatch(constructor ->
+                        constructor.getParameters().isEmpty()
+                );
     }
 
     private CodeBlock buildKeyedCodec(TypeElement type, String codecKey, String codecName, String fieldName) {
