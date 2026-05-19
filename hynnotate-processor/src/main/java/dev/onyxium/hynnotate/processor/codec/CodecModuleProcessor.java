@@ -16,11 +16,13 @@ import java.util.List;
 public class CodecModuleProcessor implements ModuleProcessor {
 
     private final ProcessingEnvironment env;
+    private final CodecResolver resolver;
     private final ClassName builderCodec = ClassName.get("com.hypixel.hytale.codec.builder", "BuilderCodec");
     private final ClassName keyedCodec = ClassName.get("com.hypixel.hytale.codec", "KeyedCodec");
 
     public CodecModuleProcessor(ProcessingEnvironment env) {
         this.env = env;
+        this.resolver = new CodecResolver(env);
     }
 
     @Override
@@ -47,7 +49,7 @@ public class CodecModuleProcessor implements ModuleProcessor {
                 .initializer(buildCodec(type))
                 .build();
 
-        var clazz = TypeSpec.classBuilder(type.getSimpleName() + "_Codec")
+        var clazz = TypeSpec.classBuilder(type.getSimpleName() + "Codec")
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                 .addField(codec)
                 .build();
@@ -77,32 +79,39 @@ public class CodecModuleProcessor implements ModuleProcessor {
                 .add("$T.builder($T.class, $T::new)\n", builderCodec, type, type);
 
         for (var element : elements) {
-            var declaredType = env.getElementUtils().getTypeElement(element.asType().toString());
-            var codecField = element.getAnnotation(CodecField.class);
+            var field = (VariableElement) element;
+            var codecField = field.getAnnotation(CodecField.class);
             if(codecField == null) continue;
 
-            var fieldName = codecField.value().isBlank() ? StringHelper.toPascalCase(element.toString()) : codecField.value();
-            var finalCodec = element.getAnnotation(CodecWith.class);
-            // TODO: choose appropriate codec
-            codeBlock.add(buildKeyedCodec(type, fieldName, declaredType.getSimpleName().toString().toUpperCase(), element.toString()));
+            var fieldName = codecField.value().isBlank() ? StringHelper.toPascalCase(field.toString()) : codecField.value();
+            var finalCodec = field.getAnnotation(CodecWith.class);
+
+            CodeBlock codecExpression;
+            if (finalCodec != null) {
+                codecExpression = CodeBlock.of("$L", finalCodec.value());
+            } else {
+                codecExpression = resolver.resolve(field);
+                if (codecExpression == null) continue;
+            }
+
+            codeBlock.add(buildKeyedCodec(type, fieldName, codecExpression, field.toString()));
         }
 
         codeBlock.add(".build()");
         return codeBlock.build();
     }
 
-    private CodeBlock buildKeyedCodec(TypeElement type, String codecKey, String codecName, String fieldName) {
-        var keyedCodecBuilder = CodeBlock.builder()
-                .add(".append(new $T<>($S, $T.$L), $T::set$L, $T::get$L).add()\n",
+    private CodeBlock buildKeyedCodec(TypeElement type, String codecKey, CodeBlock codecExpression, String fieldName) {
+        return CodeBlock.builder()
+                .add(".append(new $T<>($S, $L), $T::set$L, $T::get$L).add()\n",
                         keyedCodec,
                         codecKey,
-                        builderCodec,
-                        codecName,
+                        codecExpression,
                         type,
                         StringHelper.toPascalCase(fieldName),
                         type,
                         StringHelper.toPascalCase(fieldName)
-                );
-        return keyedCodecBuilder.build();
+                )
+                .build();
     }
 }
