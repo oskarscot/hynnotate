@@ -163,3 +163,7 @@ Not promises, just direction.
 **Documentation annotations.** Same idea for `.documentation(...)`. Annotations on the source class become doc strings on the generated codec, which feed into Hytale's existing schema output.
 
 **Beyond codecs.** Commands, event listeners, ECS components, and asset declarations all carry similar boilerplate. None are committed to. They're the obvious next places to look.
+
+## AI Usage
+
+AI is used for helping with research and generating tests.

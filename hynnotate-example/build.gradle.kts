@@ -24,7 +24,7 @@ hytale {
         description = "Hynnotate annotation processor example plugin"
         author("oskarscot")
 
-        serverVersion = "2026.05.07-5efa15f6d"
+        serverVersion = "0.5.0-pre.8"
 
         main = "dev.onyxium.hynnotate.example.HynnotateExample"
 

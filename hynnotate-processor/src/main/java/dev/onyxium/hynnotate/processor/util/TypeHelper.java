@@ -1,16 +1,19 @@
 package dev.onyxium.hynnotate.processor.util;
 
+import com.palantir.javapoet.ClassName;
+
 import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.Modifier;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
+import javax.lang.model.element.*;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
 import javax.lang.model.util.Types;
+import javax.tools.Diagnostic;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 public final class TypeHelper {
 
@@ -62,6 +65,25 @@ public final class TypeHelper {
             TypeMirror paramType = m.getParameters().getFirst().asType();
             return types.isAssignable(fieldType, paramType);
         });
+    }
+
+    public static List<TypeElement> getAllCodecImplementations(ProcessingEnvironment env) {
+        var basePackage = env.getElementUtils().getPackageElement("com.hypixel.hytale.codec.codecs");
+        var arrayCodecPackage = env.getElementUtils().getPackageElement("com.hypixel.hytale.codec.codecs.array");
+        var mapCodecPackage = env.getElementUtils().getPackageElement("com.hypixel.hytale.codec.codecs.map");
+        var setCodecPackage = env.getElementUtils().getPackageElement("com.hypixel.hytale.codec.codecs.set");
+        var simpleCodecPackage = env.getElementUtils().getPackageElement("com.hypixel.hytale.codec.codecs.simple");
+        var codec = env.getElementUtils().getTypeElement("com.hypixel.hytale.codec.Codec");
+
+        IO.println("Scanning all codec implementations...");
+
+        return Stream.of(basePackage, arrayCodecPackage, mapCodecPackage, setCodecPackage, simpleCodecPackage)
+                .filter(Objects::nonNull)
+                .flatMap(pkg -> ElementFilter.typesIn(pkg.getEnclosedElements()).stream())
+                .filter(type -> env.getTypeUtils().isAssignable(
+                        type.asType(), env.getTypeUtils().erasure(codec.asType())
+                ))
+                .toList();
     }
 
     private static List<ExecutableElement> publicInstanceMethods(ProcessingEnvironment env, TypeElement type) {

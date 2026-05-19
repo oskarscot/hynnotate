@@ -1,7 +1,6 @@
 package dev.onyxium.hynnotate.example;
 
-import com.hypixel.hytale.codec.builder.BuilderCodec;
-import com.hypixel.hytale.codec.codecs.map.MapCodec;
+import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import dev.onyxium.hynnotate.annotations.CodecField;
@@ -61,10 +60,4 @@ public class RewardComponent implements Component<EntityStore> {
     public Component<EntityStore> clone() {
         return new RewardComponent(name, amount);
     }
-
-//    Generated inside of Reward_Codec.java
-//    public static final BuilderCodec<Reward> CODEC = BuilderCodec.builder(Reward.class, Reward::new)
-//            .append(new KeyedCodec<>("Name", BuilderCodec.STRING), Reward::setName, Reward::getName).add()
-//            .append(new KeyedCodec<>("Amount", BuilderCodec.INTEGER), Reward::setAmount, Reward::getAmount).add()
-//            .build();
 }

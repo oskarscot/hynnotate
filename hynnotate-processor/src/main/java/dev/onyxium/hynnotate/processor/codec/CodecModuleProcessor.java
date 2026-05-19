@@ -101,6 +101,7 @@ public class CodecModuleProcessor implements ModuleProcessor {
         return codeBlock.build();
     }
 
+    // TODO: ugly af
     private CodeBlock buildKeyedCodec(TypeElement type, String codecKey, CodeBlock codecExpression, String fieldName) {
         return CodeBlock.builder()
                 .add(".append(new $T<>($S, $L), $T::set$L, $T::get$L).add()\n",

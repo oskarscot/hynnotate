@@ -12,7 +12,8 @@ import java.lang.annotation.Target;
 /// the generated code. It must return a codec that works for the field's
 /// type. The processor itself does not check the expression, javac
 /// does when it compiles the generated file. A typo shows up as a
-/// normal compile error on the generated source.
+/// normal compile error on the generated source. The provided codec HAS to
+/// be a full FQN expression (temporary).
 ///
 /// ### When to use
 /// - The codec lives on a different class than the field's type
