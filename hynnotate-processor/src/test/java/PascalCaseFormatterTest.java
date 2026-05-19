@@ -1,4 +1,4 @@
-import dev.onyxium.hynnotate.processor.StringHelper;
+import dev.onyxium.hynnotate.processor.util.StringHelper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

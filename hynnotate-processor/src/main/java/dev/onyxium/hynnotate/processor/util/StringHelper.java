@@ -1,4 +1,4 @@
-package dev.onyxium.hynnotate.processor;
+package dev.onyxium.hynnotate.processor.util;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;

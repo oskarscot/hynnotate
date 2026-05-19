@@ -4,7 +4,8 @@ import com.palantir.javapoet.*;
 import dev.onyxium.hynnotate.annotations.CodecField;
 import dev.onyxium.hynnotate.annotations.CodecWith;
 import dev.onyxium.hynnotate.processor.ModuleProcessor;
-import dev.onyxium.hynnotate.processor.StringHelper;
+import dev.onyxium.hynnotate.processor.util.StringHelper;
+import dev.onyxium.hynnotate.processor.util.TypeHelper;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.*;
@@ -24,12 +25,20 @@ public class CodecModuleProcessor implements ModuleProcessor {
 
     @Override
     public void generate(TypeElement type) {
-        // TODO: check whether public getters and setters exist
         var packageElement = env.getElementUtils().getPackageOf(type);
         var typeName = ClassName.get(type);
 
-        if(!hasEmptyConstructor(type)) {
+        if(!TypeHelper.hasEmptyConstructor(type)) {
             env.getMessager().printError("Class " + type.getSimpleName() + " does not declare an empty constructor!");
+            return;
+        }
+
+        var codecFields = gatherAllEligibleElements(type).stream()
+                .map(VariableElement.class::cast)
+                .toList();
+
+        if(!TypeHelper.hasAccessors(env, type, codecFields)) {
+            env.getMessager().printError("Class " + type.getSimpleName() + " does not declare a valid getter or setter method!");
             return;
         }
 
@@ -80,15 +89,6 @@ public class CodecModuleProcessor implements ModuleProcessor {
 
         codeBlock.add(".build()");
         return codeBlock.build();
-    }
-
-    private boolean hasEmptyConstructor(TypeElement type) {
-        return type.getEnclosedElements().stream()
-                .filter(e -> e.getKind() == ElementKind.CONSTRUCTOR)
-                .map(ExecutableElement.class::cast)
-                .anyMatch(constructor ->
-                        constructor.getParameters().isEmpty()
-                );
     }
 
     private CodeBlock buildKeyedCodec(TypeElement type, String codecKey, String codecName, String fieldName) {
